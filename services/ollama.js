@@ -4,12 +4,12 @@
  */
 
 const DEFAULT_MODEL = 'llama3.2'; 
-const OLLAMA_BASE_URL = 'http://bore.pub:29558';
+const DEFAULT_URL = 'http://localhost:11434';
 
 class OllamaService {
-  constructor(model = DEFAULT_MODEL) {
+  constructor(model = DEFAULT_MODEL, baseUrl = DEFAULT_URL) {
     this.model = model;
-    this.baseUrl = OLLAMA_BASE_URL;
+    this.baseUrl = baseUrl || DEFAULT_URL;
     this.updateSystemPrompt();
   }
 
