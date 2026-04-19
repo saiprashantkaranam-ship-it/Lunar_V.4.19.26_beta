@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Lunar AI — Your personal voice AI assistant">
+  <meta name="theme-color" content="#06060f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>🌙 Lunar AI</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lottie Player for custom animations -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.4/dist/lottie-player.js"></script>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+
+  <div id="app">
+    <!-- ─── Top Bar ─── -->
+    <header id="top-bar">
+      <span class="lunar-name">🌙 Lunar</span>
+      <div class="top-right">
+        <span class="status-pill" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Connecting</span>
+        </span>
+        <button class="icon-btn" id="btn-settings" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ─── AI Orb Zone (Main Visual) ─── -->
+    <div id="orb-zone">
+      <!-- CSS Animated Orb (default) -->
+      <div id="ai-orb" class="ai-orb mood-neutral">
+        <div class="orb-glow"></div>
+        <div class="orb-ring ring-1"></div>
+        <div class="orb-ring ring-2"></div>
+        <div class="orb-ring ring-3"></div>
+        <div class="orb-core">
+          <div class="core-inner"></div>
+        </div>
+        <div class="orb-particles" id="orb-particles"></div>
+      </div>
+
+      <!-- Lottie Animation (shown when user uploads custom) -->
+      <lottie-player id="lottie-orb" class="lottie-orb hidden" loop autoplay></lottie-player>
+
+      <!-- Emoji Flash Overlay -->
+      <div id="emoji-flash" class="emoji-flash hidden"></div>
+
+      <!-- Mood Label -->
+      <div id="mood-label" class="mood-label">Say "Lunar" to wake me</div>
+
+      <!-- Transcript Preview (shows what Lunar is saying/hearing) -->
+      <div id="transcript" class="transcript hidden"></div>
+    </div>
+
+    <!-- ─── Chat Messages (minimal, floating at bottom) ─── -->
+    <div id="chat-feed">
+      <div id="messages-list"></div>
+    </div>
+
+    <!-- ─── Input Area ─── -->
+    <footer id="input-area">
+      <button id="btn-mic" class="mic-btn" title="Tap to speak">
+        <svg id="mic-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+      </button>
+      <button id="btn-camera" class="mic-btn" title="Open camera">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4z"/>
+          <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        </svg>
+      </button>
+      <div class="input-wrap">
+        <textarea id="text-input" placeholder="Type a message..." rows="1"></textarea>
+      </div>
+      <button id="btn-send" class="send-btn" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </footer>
+
+    <!-- ─── Settings Panel ─── -->
+    <div id="settings-panel" class="panel hidden">
+      <div class="panel-header">
+        <h3>⚙️ Settings</h3>
+        <button class="close-btn" id="close-settings">✕</button>
+      </div>
+      <div class="panel-content">
+        <div class="setting-group">
+          <label>🎨 Upload Custom Animation</label>
+          <p class="setting-hint">Upload a Lottie JSON file from lottiefiles.com</p>
+          <input type="file" id="lottie-upload" accept=".json,.lottie" class="file-input">
+          <button id="btn-reset-anim" class="small-btn">Reset to Default Orb</button>
+        </div>
+        <div class="setting-group">
+          <label>🔊 Voice</label>
+          <select id="voice-select"></select>
+        </div>
+        <div class="setting-group">
+          <label>⚡ Speech Speed</label>
+          <input type="range" id="speech-rate" min="0.5" max="2" step="0.1" value="1">
+          <span id="speech-rate-val">1.0x</span>
+        </div>
+        <div class="setting-group">
+          <label>🎤 Auto Voice Response</label>
+          <label class="switch">
+            <input type="checkbox" id="auto-voice" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-group">
+          <label>🌐 Auto-Open Browser on Start</label>
+          <label class="switch">
+            <input type="checkbox" id="auto-open-browser" checked>
+            <span class="slider"></span>
+          </label>
+          <p class="setting-hint" style="margin-top:6px">Lunar opens automatically in your browser when you run it</p>
+        </div>
+        <div class="setting-group">
+          <label>🧠 Brain (Model Management)</label>
+          <p class="setting-hint">Pick a model → copy the command → paste in terminal to download</p>
+          <div class="model-controls">
+            <select id="model-select">
+              <option value="deepseek-r1:1.5b" data-size="1.1GB" data-ram="~2.5GB">DeepSeek R1 (1.5B) — Smart</option>
+              <option value="qwen2.5:0.5b" data-size="400MB" data-ram="~1.5GB">Qwen 2.5 (0.5B) — Fast</option>
+              <option value="qwen2.5:1.5b" data-size="1GB" data-ram="~2.5GB">Qwen 2.5 (1.5B) — Balanced</option>
+              <option value="llama3.2:1b" data-size="1.3GB" data-ram="~2.5GB">Llama 3.2 (1B)</option>
+              <option value="smollm2:135m" data-size="270MB" data-ram="~500MB">SmolLM2 (135M) — Tiny</option>
+              <option value="smollm2:360m" data-size="230MB" data-ram="~800MB">SmolLM2 (360M) — Light</option>
+              <option value="tinyllama" data-size="637MB" data-ram="~1.5GB">TinyLlama (1.1B)</option>
+              <option value="phi3:mini" data-size="2.3GB" data-ram="~3.5GB">Phi-3 Mini (3.8B) — ⚠️ Heavy</option>
+            </select>
+            <button id="btn-pull-model" class="small-btn">Download</button>
+          </div>
+          <div id="model-info" class="model-info">
+            <span>📦 Size: <b id="model-size">1.1GB</b></span>
+            <span>🧠 RAM: <b id="model-ram">~2.5GB</b></span>
+          </div>
+          <div class="cmd-box" id="cmd-box">
+            <code id="cmd-text">ollama pull deepseek-r1:1.5b</code>
+            <button class="copy-cmd-btn" id="btn-copy-cmd" title="Copy command">📋</button>
+          </div>
+          <div id="download-progress-container" class="progress-container hidden">
+            <div id="download-progress-bar" class="progress-bar"></div>
+            <span id="download-status">Downloading...</span>
+          </div>
+          <div id="ollama-status" class="status-card">Checking...</div>
+        </div>
+        <div class="setting-group">
+          <label>📟 Terminal Commands</label>
+          <p class="setting-hint">Direct paths to run Lunar from your command line</p>
+          <div class="cmd-box">
+            <div class="cmd-item">
+              <span class="cmd-label">Start Server:</span>
+              <code id="path-start-server">node server.js</code>
+              <button class="copy-cmd-btn" onclick="copyText('path-start-server')">📋</button>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">Project Folder:</span>
+              <code id="path-project">C:\...</code>
+              <button class="copy-cmd-btn" onclick="copyText('path-project')">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label>🖥️ Desktop & Auto-Sync</label>
+          <p class="setting-hint">Create a desktop icon and keep your Downloads backup updated</p>
+          
+          <div class="setting-row">
+            <span>Add Desktop Icon</span>
+            <button id="btn-create-shortcut" class="small-btn">Create Icon</button>
+          </div>
+          <div id="icon-picker-container" style="margin-top:8px">
+            <input type="text" id="icon-path" placeholder="Optional .ico path (leave empty for default)" class="key-input" style="width:100%">
+          </div>
+
+          <div class="setting-row" style="margin-top:15px">
+            <span>Auto-Sync to Downloads</span>
+            <label class="switch">
+              <input type="checkbox" id="sync-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <p class="setting-hint">Saves updates to: <span id="path-downloads" style="color:var(--accent)">...</span></p>
+          <button id="btn-sync-now" class="small-btn" style="width:100%; margin-top:10px">Manual Sync Now</button>
+        </div>
+
+        <div class="setting-group">
+          <label>🔑 API Keys</label>
+          <p class="setting-hint">Generate keys to use Lunar from your own apps, scripts, or other projects</p>
+          <div class="model-controls">
+            <input type="text" id="key-label" placeholder="Label (e.g. my-app)" class="key-input">
+            <button id="btn-generate-key" class="small-btn">Generate</button>
+          </div>
+          <div id="api-keys-list" class="keys-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Overlay -->
+  <div id="camera-overlay" class="camera-overlay hidden">
+    <div class="camera-header">
+      <span>📷 Lunar Vision</span>
+      <button id="btn-close-camera" class="close-btn">✕</button>
+    </div>
+    <div class="camera-body">
+      <video id="camera-video" autoplay playsinline></video>
+      <canvas id="camera-canvas" class="hidden"></canvas>
+      <img id="camera-preview" class="hidden" />
+    </div>
+    <div class="camera-controls">
+      <button id="btn-switch-cam" class="cam-btn">🔄 Flip</button>
+      <button id="btn-capture" class="cam-btn capture-btn">📸 Capture</button>
+      <button id="btn-send-photo" class="cam-btn hidden">🧠 Ask Lunar</button>
+      <button id="btn-retake" class="cam-btn hidden">↩️ Retake</button>
+    </div>
+    <textarea id="camera-prompt" class="camera-prompt" placeholder="Ask about this image... (e.g. 'What do you see?')" rows="2"></textarea>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
