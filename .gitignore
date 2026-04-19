@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+.env
+.gemini/
+lunar_memory.json
+lunar_api_keys.json
+models/
+ollama/
+*.log
+bin/
